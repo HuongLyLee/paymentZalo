@@ -1,8 +1,13 @@
 require("dotenv").config();
 const jwt = require("jsonwebtoken");
 const SECRET_TOKEN = process.env.SECRET_TOKEN;
+const paymenController = require("../controllers/payment");
 
 module.exports = function (req, res, next) {
+  if (req.path === '/callback') {
+    paymenController.paymentCallBackpayment(req, res);
+    return;
+  }
   if (req.method !== "GET") {
     const token = req.header("auth-token");
     if (!token)

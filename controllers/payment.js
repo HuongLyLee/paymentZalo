@@ -4,6 +4,7 @@ const CryptoJS = require("crypto-js"); // npm install crypto-js
 const bodyParser = require("body-parser"); // npm install body-parser
 const moment = require("moment"); // npm install moment
 const qs = require("qs");
+
 module.exports = {
   payment: asyncHandler(async (req, res) => {
     let result = {};
@@ -17,10 +18,15 @@ module.exports = {
 
     const embed_data = {
       //sau khi hoàn tất thanh toán sẽ đi vào link này (thường là link web thanh toán thành công của mình)
-      redirecturl: "https://phongthuytaman.com",
+      redirecturl: "http://localhost:3000/cart",
     };
 
-    const items = [];
+    var a = req.body.products
+    const items = [{
+      products: req.body.products,
+      customer: req.body.customerOrder,
+      amount: req.body.amount
+    }];
     const transID = Math.floor(Math.random() * 1000000);
 
     const order = {
@@ -33,8 +39,8 @@ module.exports = {
       amount: req.body.amount, // tuỳ vào body nhận được từ client
       //khi thanh toán xong, zalopay server sẽ POST đến url này để thông báo cho server của mình
       //Chú ý: cần dùng ngrok để public url thì Zalopay Server mới call đến được
-      callback_url: "https://b074-1-53-37-194.ngrok-free.app/callback",
-      description: `Lazada - Payment for the order #${transID}`,
+      callback_url: "https://7433-116-96-44-204.ngrok-free.app/callback",
+      description: `MintShop - Payment for the order #${transID}`,
       bank_code: "",
     };
 
@@ -70,6 +76,7 @@ module.exports = {
     console.log(req.body);
     try {
       let dataStr = req.body.data;
+      const resultData = JSON.parse(dataStr);
       let reqMac = req.body.mac;
 
       let mac = CryptoJS.HmacSHA256(dataStr, config.key2).toString();
